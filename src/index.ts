@@ -17,11 +17,8 @@ import type {
   DomainsCheckParams,
   DomainsGetInfoParams,
   DomainsGetContactsParams,
-  DomainsCreateParams,
   DomainsGetTldListParams,
   DomainsSetContactsParams,
-  DomainsReactivateParams,
-  DomainsRenewParams,
   DomainsGetRegistrarLockParams,
   DomainsSetRegistrarLockParams,
   DnsGetListParams,
@@ -107,22 +104,13 @@ class NamecheapMcpServer {
             
             case 'namecheap_domains_getcontacts':
               return await this.handleDomainsGetContacts(args as unknown as DomainsGetContactsParams);
-            
-            case 'namecheap_domains_create':
-              return await this.handleDomainsCreate(args as unknown as DomainsCreateParams);
-            
+
             case 'namecheap_domains_gettldlist':
               return await this.handleDomainsGetTldList(args as unknown as DomainsGetTldListParams);
             
             case 'namecheap_domains_setcontacts':
               return await this.handleDomainsSetContacts(args as unknown as DomainsSetContactsParams);
-            
-            case 'namecheap_domains_reactivate':
-              return await this.handleDomainsReactivate(args as unknown as DomainsReactivateParams);
-            
-            case 'namecheap_domains_renew':
-              return await this.handleDomainsRenew(args as unknown as DomainsRenewParams);
-            
+
             case 'namecheap_domains_getregistrarlock':
               return await this.handleDomainsGetRegistrarLock(args as unknown as DomainsGetRegistrarLockParams);
             
@@ -228,18 +216,6 @@ class NamecheapMcpServer {
     };
   }
 
-  private async handleDomainsCreate(args: DomainsCreateParams) {
-    const result = await this.namecheapClient.domainsCreate(args);
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(result, null, 2),
-        },
-      ],
-    };
-  }
-
   private async handleDomainsGetTldList(args: DomainsGetTldListParams) {
     // Use the TldCache to get filtered and paginated results
     const result = await this.tldCache.getTlds({
@@ -270,46 +246,6 @@ class NamecheapMcpServer {
     }
     
     const result = await this.namecheapClient.domainsSetContacts(args);
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(result, null, 2),
-        },
-      ],
-    };
-  }
-
-  private async handleDomainsReactivate(args: DomainsReactivateParams) {
-    const { domainName } = args;
-    if (!domainName) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        'domainName parameter is required'
-      );
-    }
-    
-    const result = await this.namecheapClient.domainsReactivate(args);
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(result, null, 2),
-        },
-      ],
-    };
-  }
-
-  private async handleDomainsRenew(args: DomainsRenewParams) {
-    const { domainName, years } = args;
-    if (!domainName || !years) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        'domainName and years parameters are required'
-      );
-    }
-    
-    const result = await this.namecheapClient.domainsRenew(args);
     return {
       content: [
         {
